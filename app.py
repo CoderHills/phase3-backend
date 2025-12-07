@@ -5,23 +5,31 @@ from database import engine, Base, get_db
 from schemas import BookCreate, Book
 import crud
 
-# --- Create database tables ---
+# --- Create DB tables ---
 Base.metadata.create_all(bind=engine)
 
-# --- Create FastAPI app ---
+# --- FastAPI app ---
 app = FastAPI(title="Online Bookstore API")
 
 # --- CORS setup ---
-# During development, allow all origins to fix OPTIONS 400 issues
+# TEMP settings: allow all for deployment/testing
+# After the frontend is deployed, replace "*" with your Vercel URL
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # allow all origins during development
+    allow_origins=["*"],    # replace with ["https://your-frontend.vercel.app"] later
     allow_credentials=True,
-    allow_methods=["*"],        # allow GET, POST, DELETE, OPTIONS
-    allow_headers=["*"],        # allow Content-Type and all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# --- Routes ---
+# --- HEALTH CHECK ROUTE (REQUIRED FOR RENDER) ---
+@app.get("/")
+def root():
+    return {"message": "Backend is running on Render"}
+
+# --- API ROUTES ---
+
 @app.get("/books", response_model=list[Book])
 def read_books(db: Session = Depends(get_db)):
     return crud.get_books(db)
