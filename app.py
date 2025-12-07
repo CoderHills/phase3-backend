@@ -12,18 +12,19 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Online Bookstore API")
 
 # --- CORS setup ---
-# TEMP settings: allow all for deployment/testing
-# After the frontend is deployed, replace "*" with your Vercel URL
-
+# Allow your deployed frontend + local dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],    # replace with ["https://your-frontend.vercel.app"] later
+    allow_origins=[
+        "https://phase3-frontend-nlzt600ri-coderhills-projects.vercel.app",  # deployed frontend
+        "http://localhost:5173",  # local frontend for development
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],        # allow GET, POST, DELETE, OPTIONS
+    allow_headers=["*"],        # allow Content-Type and all headers
 )
 
-# --- HEALTH CHECK ROUTE (REQUIRED FOR RENDER) ---
+# --- HEALTH CHECK ROUTE ---
 @app.get("/")
 def root():
     return {"message": "Backend is running on Render"}
